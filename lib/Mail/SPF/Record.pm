@@ -394,6 +394,8 @@ sub eval {
                 # Term is a mechanism.
                 my $mech = $term;
                 if($term->name eq "include") {
+                  # do not check for CNAMEs if it's a macro
+                  next if $term->{domain_spec}->{text} =~ /%\{/;
                   push(@include_domains, $term->{domain_spec}->{text});
                   if(scalar @include_domains > 1) {
                     foreach my $dom ( @include_domains ) {
