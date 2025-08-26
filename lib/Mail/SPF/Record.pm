@@ -394,9 +394,17 @@ sub eval {
                 # Term is a mechanism.
                 my $mech = $term;
                 if($term->name eq "include") {
-                  # do not check for CNAMEs if it's a macro
-                  next if $term->{domain_spec}->{text} =~ /%\{/;
-                  push(@include_domains, $term->{domain_spec}->{text});
+                  if($term->{domain_spec}->{text} =~ /%/) {
+                    my $macrostring = Mail::SPF::MacroString->new(
+                       text    => $term->{domain_spec}->{text} ,
+                       server  => $server,
+                       request => $request
+                    );
+                    my $expanded = $macrostring->expand;
+                    push(@include_domains, $expanded);
+                  } else {
+                    push(@include_domains, $term->{domain_spec}->{text});
+                  }
                   if(scalar @include_domains > 1) {
                     foreach my $dom ( @include_domains ) {
                       my $packet;
